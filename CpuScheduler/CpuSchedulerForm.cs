@@ -196,7 +196,7 @@ Instructions:
         /// <summary>
         /// STUDENTS: Helper method to get process data from the DataGrid
         /// Use this in your custom algorithm implementations instead of prompting users
-        /// Returns: List of process data (ID, Burst Time, Priority, Arrival Time)
+        /// Returns: List of process data (ID, Burst Time, Priority, Arrival Time, Tickets)
         /// </summary>
         public List<ProcessData> GetProcessDataFromGrid()
         {
@@ -208,7 +208,8 @@ Instructions:
                     ProcessID = row["Process ID"].ToString(),
                     BurstTime = Convert.ToInt32(row["Burst Time"]),
                     Priority = Convert.ToInt32(row["Priority"]),
-                    ArrivalTime = Convert.ToInt32(row["Arrival Time"])
+                    ArrivalTime = Convert.ToInt32(row["Arrival Time"]),
+                    ticket_count = Convert.ToInt32(row["Tickets"])
                 });
             }
             return processList;
@@ -224,6 +225,7 @@ Instructions:
             public int BurstTime { get; set; }
             public int Priority { get; set; }
             public int ArrivalTime { get; set; }
+            public int ticket_count {get; set; }
         }
 
         /// <summary>
@@ -462,6 +464,61 @@ Instructions:
             return processResults.Values.OrderBy(r => r.StartTime).ToList();
         }
 
+        private List<SchedulingResult> runLotteryAlgorithm(List<ProcessData> processes)
+        {
+            var results = new List<SchedulingResult>();
+            var current_time = 0;
+            var remaining_processes = processes.ToList();
+            while (remaining_processes.Count > 0)
+            {
+                // Get processes that have arrived by current time
+                var availableProcesses = remaining_processes.Where(p => p.ArrivalTime <= current_time).ToList();
+
+                if (availableProcesses.Count == 0)
+                {
+                    // No process has arrived yet, jump to next arrival time
+                    current_time = remaining_processes.Min(p => p.ArrivalTime);
+                    continue;
+                }
+
+                //select next process based on ticket drawn
+                int total_tickets = availableProcesses.Sum(p => p.ticket_count);
+                int winning_ticket = random.Next(1, total_tickets + 1);
+                //select the winner as the next proccess
+                ProcessData next_process = null;
+                var cumulative = 0;
+                foreach (var p in availableProcesses)
+                {
+                    cumulative += p.ticket_count;
+                    if (winning_ticket <= cumulative)
+                    {
+                        next_process = p;
+                        break;
+                    }
+                }
+                //calculate the winner's data and remove it
+                var start_time = Math.Max(current_time, next_process.ArrivalTime);
+                var finish_time = start_time + next_process.BurstTime;
+                var waiting_time = start_time - next_process.ArrivalTime;
+                var turnaround_time = finish_time - next_process.ArrivalTime;
+
+                results.Add(new SchedulingResult
+                {
+                    ProcessID = next_process.ProcessID,
+                    ArrivalTime = next_process.ArrivalTime,
+                    BurstTime = next_process.BurstTime,
+                    StartTime = start_time,
+                    FinishTime = finish_time,
+                    WaitingTime = waiting_time,
+                    TurnaroundTime = turnaround_time
+                });
+                current_time = finish_time;
+                remaining_processes.Remove(next_process);
+            }
+            return results.OrderBy(r => r.StartTime).ToList();
+            
+
+        }
         /// <summary>
         /// STUDENTS: Data structure for algorithm results
         /// Use this to store and display scheduling algorithm outcomes
@@ -548,6 +605,7 @@ Instructions:
             processTable.Columns.Add("Burst Time", typeof(int));
             processTable.Columns.Add("Priority", typeof(int));
             processTable.Columns.Add("Arrival Time", typeof(int));
+            processTable.Columns.Add("Tickets", typeof(int));
 
             processDataGrid.DataSource = processTable;
             processDataGrid.AllowUserToAddRows = false;
@@ -560,6 +618,7 @@ Instructions:
                 processDataGrid.Columns[1].Width = 100; // Burst Time
                 processDataGrid.Columns[2].Width = 100; // Priority  
                 processDataGrid.Columns[3].Width = 100; // Arrival Time
+                processDataGrid.Columns[4].Width = 100; // Tickets
                 
                 // STUDENTS: Performance optimizations for larger datasets
                 processDataGrid.VirtualMode = false; // Set to true if using 500+ processes
@@ -602,6 +661,7 @@ Instructions:
                     row["Burst Time"] = random.Next(1, 11); // Default 1-10
                     row["Priority"] = i + 1; // Default priority
                     row["Arrival Time"] = 0; // Default arrival time
+                    row["Tickets"] = 5; //Default ticket amount
                     processTable.Rows.Add(row);
                 }
 
@@ -626,6 +686,7 @@ Instructions:
                 row["Burst Time"] = random.Next(1, 21);
                 row["Priority"] = random.Next(1, processTable.Rows.Count + 1);
                 row["Arrival Time"] = random.Next(0, 10);
+                row["Tickets"] = random.Next(5, 25);
             }
         }
 
@@ -656,6 +717,7 @@ Instructions:
                         row["Burst Time"] = random.Next(1, 6);
                         row["Priority"] = random.Next(1, 5);
                         row["Arrival Time"] = 0;
+                        row["Tickets"] = random.Next(5, 10);
                     }
                     break;
                     
@@ -665,6 +727,7 @@ Instructions:
                         row["Burst Time"] = random.Next(1, 21);
                         row["Priority"] = random.Next(1, 10);
                         row["Arrival Time"] = random.Next(0, 5);
+                        row["Tickets"] = random.Next(5, 25);
                     }
                     break;
                     
@@ -674,6 +737,7 @@ Instructions:
                         row["Burst Time"] = random.Next(10, 31);
                         row["Priority"] = random.Next(1, 5);
                         row["Arrival Time"] = random.Next(0, 10);
+                        row["Tickets"] = random.Next(20, 100);
                     }
                     break;
                     
@@ -925,6 +989,30 @@ Instructions:
             else
             {
                 MessageBox.Show("Please set process count and ensure the data grid has process data.", 
+                    "No Process Data", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtProcess.Focus();
+            }
+        }
+
+        private void LotteryButton_Click(object sender, EventArgs e)
+        {
+            var processData = GetProcessDataFromGrid();
+            if (processData.Count > 0)
+            {
+                // STUDENTS: Updated implementation using DataGrid data
+                var results = runLotteryAlgorithm(processData);
+
+                // Update Results tab with detailed scheduling results
+                DisplaySchedulingResults(results, "Lottery Scheduling (Higher # of tickets = Greater chance of execution)");
+
+                // Switch to Results panel and update sidebar
+                ShowPanel(resultsPanel);
+                sidePanel.Height = btnDashBoard.Height;
+                sidePanel.Top = btnDashBoard.Top;
+            }
+            else
+            {
+                MessageBox.Show("Please set process count and ensure the data grid has process data.",
                     "No Process Data", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 txtProcess.Focus();
             }
