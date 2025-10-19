@@ -31,10 +31,10 @@
             components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CpuSchedulerForm));
             panel1 = new System.Windows.Forms.Panel();
+            btnCpuScheduler = new System.Windows.Forms.Button();
             sidePanel = new System.Windows.Forms.Panel();
             label1 = new System.Windows.Forms.Label();
             btnWelcome = new System.Windows.Forms.Button();
-            btnCpuScheduler = new System.Windows.Forms.Button();
             btnDashBoard = new System.Windows.Forms.Button();
             btnAbout = new System.Windows.Forms.Button();
             btnDarkModeToggle = new System.Windows.Forms.Button();
@@ -56,6 +56,8 @@
             btnSJF = new System.Windows.Forms.Button();
             btnPriority = new System.Windows.Forms.Button();
             btnRoundRobin = new System.Windows.Forms.Button();
+            btnLottery = new System.Windows.Forms.Button();
+            btnHRRN = new System.Windows.Forms.Button();
             txtProcess = new System.Windows.Forms.TextBox();
             labelProcess = new System.Windows.Forms.Label();
             resultsPanel = new System.Windows.Forms.Panel();
@@ -63,7 +65,6 @@
             aboutPanel = new System.Windows.Forms.Panel();
             aboutTextBox = new System.Windows.Forms.RichTextBox();
             timer1 = new System.Windows.Forms.Timer(components);
-            btnLottery = new System.Windows.Forms.Button();
             panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             contentPanel.SuspendLayout();
@@ -93,6 +94,24 @@
             panel1.Name = "panel1";
             panel1.Size = new System.Drawing.Size(164, 600);
             panel1.TabIndex = 0;
+            // 
+            // btnCpuScheduler
+            // 
+            btnCpuScheduler.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            btnCpuScheduler.Cursor = System.Windows.Forms.Cursors.Hand;
+            btnCpuScheduler.FlatAppearance.BorderSize = 0;
+            btnCpuScheduler.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            btnCpuScheduler.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            btnCpuScheduler.Image = (System.Drawing.Image)resources.GetObject("btnCpuScheduler.Image");
+            btnCpuScheduler.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            btnCpuScheduler.Location = new System.Drawing.Point(11, 180);
+            btnCpuScheduler.Name = "btnCpuScheduler";
+            btnCpuScheduler.Size = new System.Drawing.Size(150, 40);
+            btnCpuScheduler.TabIndex = 2;
+            btnCpuScheduler.Text = "    Scheduler";
+            btnCpuScheduler.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            btnCpuScheduler.UseVisualStyleBackColor = true;
+            btnCpuScheduler.Click += CpuSchedulerButton_Click;
             // 
             // sidePanel
             // 
@@ -129,24 +148,6 @@
             btnWelcome.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             btnWelcome.UseVisualStyleBackColor = false;
             btnWelcome.Click += WelcomeButton_Click;
-            // 
-            // btnCpuScheduler
-            // 
-            btnCpuScheduler.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
-            btnCpuScheduler.Cursor = System.Windows.Forms.Cursors.Hand;
-            btnCpuScheduler.FlatAppearance.BorderSize = 0;
-            btnCpuScheduler.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            btnCpuScheduler.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
-            btnCpuScheduler.Image = (System.Drawing.Image)resources.GetObject("btnCpuScheduler.Image");
-            btnCpuScheduler.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            btnCpuScheduler.Location = new System.Drawing.Point(11, 180);
-            btnCpuScheduler.Name = "btnCpuScheduler";
-            btnCpuScheduler.Size = new System.Drawing.Size(150, 40);
-            btnCpuScheduler.TabIndex = 2;
-            btnCpuScheduler.Text = "    Scheduler";
-            btnCpuScheduler.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            btnCpuScheduler.UseVisualStyleBackColor = true;
-            btnCpuScheduler.Click += CpuSchedulerButton_Click;
             // 
             // btnDashBoard
             // 
@@ -376,6 +377,7 @@
             algorithmButtonPanel.Controls.Add(btnPriority);
             algorithmButtonPanel.Controls.Add(btnRoundRobin);
             algorithmButtonPanel.Controls.Add(btnLottery);
+            algorithmButtonPanel.Controls.Add(btnHRRN);
             algorithmButtonPanel.Location = new System.Drawing.Point(20, 450);
             algorithmButtonPanel.Name = "algorithmButtonPanel";
             algorithmButtonPanel.Size = new System.Drawing.Size(690, 120);
@@ -444,6 +446,38 @@
             btnRoundRobin.Text = "ROUND ROBIN";
             btnRoundRobin.UseVisualStyleBackColor = false;
             btnRoundRobin.Click += RoundRobinButton_Click;
+            // 
+            // btnLottery
+            // 
+            btnLottery.BackColor = System.Drawing.Color.LightGreen;
+            btnLottery.Cursor = System.Windows.Forms.Cursors.Hand;
+            btnLottery.FlatAppearance.MouseOverBackColor = System.Drawing.Color.PaleGreen;
+            btnLottery.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            btnLottery.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
+            btnLottery.Location = new System.Drawing.Point(10, 65);
+            btnLottery.Margin = new System.Windows.Forms.Padding(10, 5, 10, 5);
+            btnLottery.Name = "btnLottery";
+            btnLottery.Size = new System.Drawing.Size(140, 50);
+            btnLottery.TabIndex = 13;
+            btnLottery.Text = "LOTTERY";
+            btnLottery.UseVisualStyleBackColor = false;
+            btnLottery.Click += LotteryButton_Click;
+            // 
+            // btnHRRN
+            // 
+            btnHRRN.BackColor = System.Drawing.Color.LemonChiffon;
+            btnHRRN.Cursor = System.Windows.Forms.Cursors.Hand;
+            btnHRRN.FlatAppearance.MouseOverBackColor = System.Drawing.Color.PaleGreen;
+            btnHRRN.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            btnHRRN.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
+            btnHRRN.Location = new System.Drawing.Point(170, 65);
+            btnHRRN.Margin = new System.Windows.Forms.Padding(10, 5, 10, 5);
+            btnHRRN.Name = "btnHRRN";
+            btnHRRN.Size = new System.Drawing.Size(140, 50);
+            btnHRRN.TabIndex = 14;
+            btnHRRN.Text = "HRRN";
+            btnHRRN.UseVisualStyleBackColor = false;
+            btnHRRN.Click += HighestResponseButton_Click;
             // 
             // txtProcess
             // 
@@ -517,22 +551,6 @@
             aboutTextBox.TabIndex = 0;
             aboutTextBox.Text = "";
             // 
-            // btnLottery
-            // 
-            btnLottery.BackColor = System.Drawing.Color.PapayaWhip;
-            btnLottery.Cursor = System.Windows.Forms.Cursors.Hand;
-            btnLottery.FlatAppearance.MouseOverBackColor = System.Drawing.Color.PaleGreen;
-            btnLottery.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            btnLottery.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, 0);
-            btnLottery.Location = new System.Drawing.Point(10, 65);
-            btnLottery.Margin = new System.Windows.Forms.Padding(10, 5, 10, 5);
-            btnLottery.Name = "btnLottery";
-            btnLottery.Size = new System.Drawing.Size(140, 50);
-            btnLottery.TabIndex = 13;
-            btnLottery.Text = "LOTTERY";
-            btnLottery.UseVisualStyleBackColor = false;
-            btnLottery.Click += LotteryButton_Click;
-            // 
             // CpuSchedulerForm
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
@@ -595,5 +613,6 @@
         private System.Windows.Forms.FlowLayoutPanel algorithmButtonPanel;
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.Button btnLottery;
+        private System.Windows.Forms.Button btnHRRN;
     }
 }

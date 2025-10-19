@@ -225,7 +225,8 @@ Instructions:
             public int BurstTime { get; set; }
             public int Priority { get; set; }
             public int ArrivalTime { get; set; }
-            public int ticket_count {get; set; }
+            public int ticket_count { get; set; }
+            public int waiting_time { get; set; }
         }
 
         /// <summary>
@@ -516,8 +517,57 @@ Instructions:
                 remaining_processes.Remove(next_process);
             }
             return results.OrderBy(r => r.StartTime).ToList();
-            
+        }
+        //highest response ratio next scheduling
+        private List<SchedulingResult> runHighestResponseAlgorithm(List<ProcessData> processes)
+        {
+            var results = new List<SchedulingResult>();
+            var current_time = 0;
+            var remaining_processes = processes.ToList();
+            while (remaining_processes.Count > 0)
+            {
+                var availableProcesses = remaining_processes.Where(p => p.ArrivalTime <= current_time).ToList();
 
+                if (availableProcesses.Count == 0)
+                {
+                    // No process has arrived yet, jump to next arrival time
+                    current_time = remaining_processes.Min(p => p.ArrivalTime);
+                    continue;
+                }
+
+                //calculate the highest response ratio and select the next process based on that
+                ProcessData next_process = availableProcesses.First();
+                foreach (var p in availableProcesses)
+                {
+                    if (1 + (p.waiting_time / p.BurstTime) > (1 + (next_process.waiting_time / p.BurstTime)))
+                    {
+                        next_process = p;
+                    }
+                }
+
+                var start_time = Math.Max(current_time, next_process.ArrivalTime);
+                var finish_time = start_time + next_process.BurstTime;
+                var waiting_time = start_time - next_process.ArrivalTime;
+                var turnaround_time = finish_time - next_process.ArrivalTime;
+
+                results.Add(new SchedulingResult
+                {
+                    ProcessID = next_process.ProcessID,
+                    ArrivalTime = next_process.ArrivalTime,
+                    BurstTime = next_process.BurstTime,
+                    StartTime = start_time,
+                    FinishTime = finish_time,
+                    WaitingTime = waiting_time,
+                    TurnaroundTime = turnaround_time
+                });
+                foreach (var p in availableProcesses)
+                {
+                    p.waiting_time = start_time - next_process.ArrivalTime;
+                }
+                current_time = finish_time;
+                remaining_processes.Remove(next_process);
+            }
+            return results.OrderBy(r => r.StartTime).ToList();
         }
         /// <summary>
         /// STUDENTS: Data structure for algorithm results
@@ -1018,6 +1068,30 @@ Instructions:
             }
         }
 
+        private void HighestResponseButton_Click(object sender, EventArgs e)
+        {
+            var processData = GetProcessDataFromGrid();
+            if (processData.Count > 0)
+            {
+                // STUDENTS: Updated implementation using DataGrid data
+                var results = runHighestResponseAlgorithm(processData);
+
+                // Update Results tab with detailed scheduling results
+                DisplaySchedulingResults(results, "Highest Response Ratio Next Scheduling (Highest wait time and lowest burst time = execution)");
+
+                // Switch to Results panel and update sidebar
+                ShowPanel(resultsPanel);
+                sidePanel.Height = btnDashBoard.Height;
+                sidePanel.Top = btnDashBoard.Top;
+            }
+            else
+            {
+                MessageBox.Show("Please set process count and ensure the data grid has process data.",
+                    "No Process Data", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtProcess.Focus();
+            }
+        }
+
         /// <summary>
         /// Occurs when the process count text changes.
         /// </summary>
@@ -1094,6 +1168,8 @@ Instructions:
             ApplyRoundedCorners(btnPriority);
             ApplyRoundedCorners(btnRoundRobin);
             ApplyRoundedCorners(btnDarkModeToggle);
+            ApplyRoundedCorners(btnLottery);
+            ApplyRoundedCorners(btnHRRN);
             
             // Apply default dark theme
             ApplyTheme();
@@ -1116,6 +1192,7 @@ Instructions:
                 row["Burst Time"] = new int[] { 6, 8, 7, 3, 4 }[i]; // Interesting mix for learning
                 row["Priority"] = i + 1; // Sequential priorities
                 row["Arrival Time"] = new int[] { 0, 2, 4, 6, 8 }[i]; // Staggered arrivals
+                row["Tickets"] = new int[] { 5, 6, 7, 8, 9 }[i];
                 processTable.Rows.Add(row);
             }
 
@@ -1162,6 +1239,7 @@ Instructions:
             ApplyDarkThemeToButton(btnDashBoard);
             ApplyDarkThemeToButton(btnAbout);
             ApplyDarkThemeToButton(btnDarkModeToggle);
+            
             
             // Restart label
             restartApp.BackColor = Color.FromArgb(37, 37, 38);
@@ -1214,6 +1292,8 @@ Instructions:
             ApplyDarkThemeToSchedulerButton(btnSJF);
             ApplyDarkThemeToSchedulerButton(btnPriority);
             ApplyDarkThemeToSchedulerButton(btnRoundRobin);
+            ApplyDarkThemeToSchedulerButton(btnLottery);
+            ApplyDarkThemeToSchedulerButton(btnHRRN);
         }
 
         /// <summary>
@@ -1288,12 +1368,16 @@ Instructions:
             btnSJF.BackColor = Color.AntiqueWhite;
             btnPriority.BackColor = Color.Bisque;
             btnRoundRobin.BackColor = Color.PapayaWhip;
+            btnLottery.BackColor = Color.LightGreen;
+            btnHRRN.BackColor = Color.LemonChiffon;
             
             // Reset text color for algorithm buttons
             btnFCFS.ForeColor = SystemColors.ControlText;
             btnSJF.ForeColor = SystemColors.ControlText;
             btnPriority.ForeColor = SystemColors.ControlText;
             btnRoundRobin.ForeColor = SystemColors.ControlText;
+            btnHRRN.ForeColor = SystemColors.ControlText;
+            btnLottery.ForeColor = SystemColors.ControlText;
         }
 
         /// <summary>
