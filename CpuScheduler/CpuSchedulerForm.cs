@@ -651,6 +651,49 @@ Instructions:
         /// <summary>
         /// Initializes the process data table structure.
         /// </summary>
+        private void SaveResultsData_Click(object sender, EventArgs e)
+        {
+            if (resultsTable.Rows.Count == 0)
+            {
+                MessageBox.Show("No process data to save. Please set process count first.",
+                    "No Data", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            using (var saveDialog = new SaveFileDialog())
+            {
+                saveDialog.Filter = "CSV files (*.csv)|*.csv|All files (*.*)|*.*";
+                saveDialog.DefaultExt = "csv";
+                saveDialog.FileName = "ProcessData.csv";
+                saveDialog.Title = "Save Process Data";
+
+                if (saveDialog.ShowDialog() == DialogResult.OK)
+                {
+                    try
+                    {
+                        using (var writer = new System.IO.StreamWriter(saveDialog.FileName))
+                        {
+                            // Write header
+                            writer.WriteLine("Process ID,Burst Time,Priority,Arrival Time,Tickets");
+
+                            // Write data rows
+                            foreach (DataRow row in processTable.Rows)
+                            {
+                                writer.WriteLine($"{row["Process ID"]},{row["Burst Time"]},{row["Priority"]},{row["Arrival Time"]},{row["Tickets"]}");
+                            }
+                        }
+
+                        MessageBox.Show($"Process data saved successfully to:\n{saveDialog.FileName}",
+                            "Export Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error saving file: {ex.Message}",
+                            "Save Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+            }
+        }
         private void InitializeProcessTable()
         {
             processTable = new DataTable();
