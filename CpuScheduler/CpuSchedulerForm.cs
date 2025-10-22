@@ -595,12 +595,12 @@ Instructions:
 
             // Set up columns for detailed results
             listView1.Columns.Add("Process ID", 100, HorizontalAlignment.Center);
-            listView1.Columns.Add("Arrival", 80, HorizontalAlignment.Center);
-            listView1.Columns.Add("Burst", 80, HorizontalAlignment.Center);
-            listView1.Columns.Add("Start", 80, HorizontalAlignment.Center);
-            listView1.Columns.Add("Finish", 80, HorizontalAlignment.Center);
-            listView1.Columns.Add("Waiting", 80, HorizontalAlignment.Center);
-            listView1.Columns.Add("Turnaround", 90, HorizontalAlignment.Center);
+            listView1.Columns.Add("Arrival", 100, HorizontalAlignment.Center);
+            listView1.Columns.Add("Burst", 100, HorizontalAlignment.Center);
+            listView1.Columns.Add("Start", 100, HorizontalAlignment.Center);
+            listView1.Columns.Add("Finish", 100, HorizontalAlignment.Center);
+            listView1.Columns.Add("Waiting", 100, HorizontalAlignment.Center);
+            listView1.Columns.Add("Turnaround", 100, HorizontalAlignment.Center);
 
             // Add process results
             foreach (var result in results)
@@ -618,14 +618,17 @@ Instructions:
             // Add summary statistics
             var avgWaiting = results.Average(r => r.WaitingTime);
             var avgTurnaround = results.Average(r => r.TurnaroundTime);
-            
+            int total_time_elapsed = results.Max(r => r.FinishTime);
+            var throughput = ((double)results.Count / total_time_elapsed);
+            var cpu_util = (((double)results.Sum(r => r.BurstTime) / total_time_elapsed) * 100);
+
             var summaryItem = new ListViewItem("SUMMARY");
             summaryItem.SubItems.Add(algorithmName);
             summaryItem.SubItems.Add($"{results.Count} processes");
             summaryItem.SubItems.Add($"Avg Wait: {avgWaiting:F1}");
             summaryItem.SubItems.Add($"Avg Turn: {avgTurnaround:F1}");
-            summaryItem.SubItems.Add("");
-            summaryItem.SubItems.Add("");
+            summaryItem.SubItems.Add($"Throughput: {throughput:F3}");
+            summaryItem.SubItems.Add($"CPU Utilization(%): {cpu_util:F1}");
             listView1.Items.Add(summaryItem);
 
             // TODO: STUDENTS - Add performance metrics calculation and display here
@@ -798,6 +801,7 @@ Instructions:
                         row["Burst Time"] = random.Next(5, 15);
                         row["Priority"] = priority--;
                         row["Arrival Time"] = 0;
+                        row["Tickets"] = random.Next(20, 100);
                     }
                     break;
             }
@@ -832,12 +836,12 @@ Instructions:
                         using (var writer = new System.IO.StreamWriter(saveDialog.FileName))
                         {
                             // Write header
-                            writer.WriteLine("Process ID,Burst Time,Priority,Arrival Time");
+                            writer.WriteLine("Process ID,Burst Time,Priority,Arrival Time,Tickets");
                             
                             // Write data rows
                             foreach (DataRow row in processTable.Rows)
                             {
-                                writer.WriteLine($"{row["Process ID"]},{row["Burst Time"]},{row["Priority"]},{row["Arrival Time"]}");
+                                writer.WriteLine($"{row["Process ID"]},{row["Burst Time"]},{row["Priority"]},{row["Arrival Time"]},{row["Tickets"]}");
                             }
                         }
                         
@@ -888,9 +892,9 @@ Instructions:
                                 lineNumber++;
                                 var parts = line.Split(',');
                                 
-                                if (parts.Length != 4)
+                                if (parts.Length != 5)
                                 {
-                                    MessageBox.Show($"Invalid format on line {lineNumber}. Expected format: ProcessID,BurstTime,Priority,ArrivalTime", 
+                                    MessageBox.Show($"Invalid format on line {lineNumber}. Expected format: ProcessID,BurstTime,Priority,ArrivalTime,Tickets", 
                                         "Load Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                                     return;
                                 }
@@ -902,7 +906,8 @@ Instructions:
                                         ProcessID = parts[0].Trim(),
                                         BurstTime = int.Parse(parts[1].Trim()),
                                         Priority = int.Parse(parts[2].Trim()),
-                                        ArrivalTime = int.Parse(parts[3].Trim())
+                                        ArrivalTime = int.Parse(parts[3].Trim()),
+                                        ticket_count = int.Parse(parts[4].Trim())
                                     });
                                 }
                                 catch (FormatException)
@@ -937,6 +942,7 @@ Instructions:
                             row["Burst Time"] = process.BurstTime;
                             row["Priority"] = process.Priority;
                             row["Arrival Time"] = process.ArrivalTime;
+                            row["Tickets"] = process.ticket_count;
                             processTable.Rows.Add(row);
                         }
 
