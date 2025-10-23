@@ -4,6 +4,7 @@ using System.Data;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
+using System.Text;
 using System.Windows.Forms;
 
 namespace CpuScheduler
@@ -653,9 +654,9 @@ Instructions:
         /// </summary>
         private void SaveResultsData_Click(object sender, EventArgs e)
         {
-            if (resultsTable.Rows.Count == 0)
+            if (listView1.Items.Count == 0)
             {
-                MessageBox.Show("No process data to save. Please set process count first.",
+                MessageBox.Show("No results data to save. Please run an algorithm first.",
                     "No Data", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
@@ -664,8 +665,8 @@ Instructions:
             {
                 saveDialog.Filter = "CSV files (*.csv)|*.csv|All files (*.*)|*.*";
                 saveDialog.DefaultExt = "csv";
-                saveDialog.FileName = "ProcessData.csv";
-                saveDialog.Title = "Save Process Data";
+                saveDialog.FileName = "ResultsData.csv";
+                saveDialog.Title = "Result Data";
 
                 if (saveDialog.ShowDialog() == DialogResult.OK)
                 {
@@ -674,12 +675,24 @@ Instructions:
                         using (var writer = new System.IO.StreamWriter(saveDialog.FileName))
                         {
                             // Write header
-                            writer.WriteLine("Process ID,Burst Time,Priority,Arrival Time,Tickets");
+                            writer.WriteLine("Process ID,Burst Time,Priority,Arrival Time,Tickets,Waiting,Turnaround");
 
-                            // Write data rows
-                            foreach (DataRow row in processTable.Rows)
+                            var temp = new List<ListViewItem>();
+                            foreach (ListViewItem item in listView1.Items)
                             {
-                                writer.WriteLine($"{row["Process ID"]},{row["Burst Time"]},{row["Priority"]},{row["Arrival Time"]},{row["Tickets"]}");
+                                temp.Add(item);
+                            }
+                            
+                            foreach (ListViewItem item in temp)
+                            {
+                                StringBuilder sb = new StringBuilder();
+                                foreach(ListViewItem.ListViewSubItem subitem in item.SubItems)
+                                {
+                                    sb.Append(subitem.Text);
+                                    sb.Append(",");
+                                }
+                                sb.Remove(sb.Length - 1, 1);
+                                writer.WriteLine(sb.ToString());
                             }
                         }
 
