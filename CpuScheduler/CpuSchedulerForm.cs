@@ -595,13 +595,13 @@ Instructions:
             listView1.View = View.Details;
 
             // Set up columns for detailed results
-            listView1.Columns.Add("Process ID", 100, HorizontalAlignment.Center);
+            listView1.Columns.Add("Process ID", 70, HorizontalAlignment.Center);
             listView1.Columns.Add("Arrival", 100, HorizontalAlignment.Center);
-            listView1.Columns.Add("Burst", 100, HorizontalAlignment.Center);
+            listView1.Columns.Add("Burst", 80, HorizontalAlignment.Center);
             listView1.Columns.Add("Start", 100, HorizontalAlignment.Center);
             listView1.Columns.Add("Finish", 100, HorizontalAlignment.Center);
-            listView1.Columns.Add("Waiting", 100, HorizontalAlignment.Center);
-            listView1.Columns.Add("Turnaround", 100, HorizontalAlignment.Center);
+            listView1.Columns.Add("Waiting", 120, HorizontalAlignment.Center);
+            listView1.Columns.Add("Turnaround", 150, HorizontalAlignment.Center);
 
             // Add process results
             foreach (var result in results)
@@ -619,7 +619,7 @@ Instructions:
             // Add summary statistics
             var avgWaiting = results.Average(r => r.WaitingTime);
             var avgTurnaround = results.Average(r => r.TurnaroundTime);
-            int total_time_elapsed = results.Max(r => r.FinishTime);
+            int total_time_elapsed = results.Max(r => r.FinishTime) - results.Min(r => r.ArrivalTime);
             var throughput = ((double)results.Count / total_time_elapsed);
             var cpu_util = (((double)results.Sum(r => r.BurstTime) / total_time_elapsed) * 100);
 
@@ -654,7 +654,7 @@ Instructions:
         /// </summary>
         private void SaveResultsData_Click(object sender, EventArgs e)
         {
-            if (listView1.Items.Count == 0)
+            if (listView1.Items.Count.Equals(0))
             {
                 MessageBox.Show("No results data to save. Please run an algorithm first.",
                     "No Data", MessageBoxButtons.OK, MessageBoxIcon.Information);
