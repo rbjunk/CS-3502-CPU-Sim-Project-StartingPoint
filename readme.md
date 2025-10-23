@@ -2,7 +2,7 @@
 
 This project provides a Windows Forms application that demonstrates common CPU scheduling algorithms through an interactive graphical interface. Each algorithm prompts for basic input and displays the resulting waiting or turnaround times using message boxes and on-screen tables.
 
-**Fork maintained by Chris Regan** - Original creator: Francis (used with permission)
+**Fork maintained by Cannon Blocker** Forked from - Chris Regan - Original creator: Francis (used with permission)
 
 ## Project status
 
@@ -14,6 +14,8 @@ The simulator is functional but still a work in progress. Currently the followin
 | Shortest Job First | `Algorithms.RunShortestJobFirst` | Jobs are sorted by burst time before execution. |
 | Priority Scheduling | `Algorithms.RunPriorityScheduling` | User supplies a priority value for each job. |
 | Round Robin | `Algorithms.RunRoundRobin` | Requires a quantum time parameter. |
+| Lottery | `Algorithms.RunLotteryAlgorithm` | Requires a ticket count parameter |
+| HRRN | `Algorithms.RunHighestResponseAlgorithm` | Sorted by burst and wait time|
 
 Additional algorithms can easily be added by extending `Algorithms.cs`.
 
@@ -30,7 +32,7 @@ Additional algorithms can easily be added by extending `Algorithms.cs`.
 1. Clone the repository:
 
    ```bash
-   git clone git@github.com:iAmGiG/CS-3502-CPU-Sim-Project-StartingPoint.git
+   git clone git@github.com:rbjunk/CS-3502-CPU-Sim-Project-StartingPoint.git
    ```
 
 2. Open `CpuScheduler.sln` in Visual Studio 2022
@@ -41,7 +43,7 @@ Additional algorithms can easily be added by extending `Algorithms.cs`.
 1. Clone the repository:
 
    ```bash
-   git clone git@github.com:iAmGiG/CS-3502-CPU-Sim-Project-StartingPoint.git
+   git clone git@github.com:rbjunk/CS-3502-CPU-Sim-Project-StartingPoint.git
    ```
 
 2. Install the C# Dev Kit extension in VS Code
